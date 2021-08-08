@@ -1,6 +1,9 @@
 var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
 var audioContext = new AudioContextFunc();
 var player=new WebAudioFontPlayer();
+var instr=null;
+var base = 'https://surikov.github.io/webaudiofontdata/sound/';
+
 player.loader.decodeAfterLoading(audioContext, '_tone_0250_SoundBlasterOld_sf2');
 
 var sound_library = {
@@ -18,18 +21,39 @@ var sound_library = {
 
 // queueWaveTable(audioContext, target, preset, when, pitch, duration, volume, slides)
 
+
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     dash_midi: {
+
         play: function(preset, when, pitch, duration, volume) {
+			instr_name = '_tone_' + preset
+
+        	if (typeof window[instr_name] !== 'undefined') {
+			    console.log('variable ' + instr_name + ' exists!')
+			} else {
+				console.log('loading ', instr_name);
+				path = base + preset + '.js';
+				player.loader.startLoad(audioContext, path, instr_name);
+				player.loader.waitLoad(function () {
+					instr=window[instr_name];
+				});
+			}
+
 		    player.queueWaveTable(
 		    	audioContext,
 		    	audioContext.destination,
-		    	sound_library[preset],
+		    	window['_tone_'+preset],
 		    	audioContext.currentTime + parseInt(when),
 		    	parseInt(pitch),
 		    	duration,
 		    	volume);
 		    return false;
-        }
+        },
     }
 });
+
+
+// changeInstrument('https://surikov.github.io/webaudiofontdata/sound/0290_Aspirin_sf2_file.js','_tone_0290_Aspirin_sf2_file');
+
+
+

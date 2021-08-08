@@ -1,3 +1,4 @@
+* switchable instrument
 
 # 2021-08-08 16:10:35.666172: clock-in
 

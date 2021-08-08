@@ -8,16 +8,18 @@ from dash.dependencies import Input, Output, ClientsideFunction
 from jupyter_dash import JupyterDash
 import dash_core_components as dcc
 import dash_html_components as html
+import json
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = JupyterDash(__name__,
                   external_stylesheets=external_stylesheets,
                   external_scripts=['https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js',
-                                    'https://surikov.github.io/webaudiofontdata/sound/0250_SoundBlasterOld_sf2.js'])
+                                    'https://surikov.github.io/webaudiofontdata/sound/0250_SoundBlasterOld_sf2.js',
+                                    'https://surikov.github.io/webaudiofontdata/sound/0240_Chaos_sf2_file.js',])
 
 
-
+# changeInstrument('https://surikov.github.io/webaudiofontdata/sound/0290_Aspirin_sf2_file.js','_tone_0290_Aspirin_sf2_file');
 
 simple_pitch = html.Div(children=[
     html.Div([
@@ -26,10 +28,14 @@ simple_pitch = html.Div(children=[
             dcc.Dropdown(
                 id='preset',
                 options=[
-                    {'label': '_tone_0250_SoundBlasterOld_sf2', 'value': '_tone_0250_SoundBlasterOld_sf2'},
+                    {'label': 'piano',
+                     'value': '0250_SoundBlasterOld_sf2'},
+                    {'label': 'guitar',
+                     'value': '0240_Chaos_sf2_file'},
                 ],
-                value='_tone_0250_SoundBlasterOld_sf2',
-            )], className='two columns'),
+                value='0250_SoundBlasterOld_sf2',
+                clearable=False,
+            )], className='three columns'),
         html.Div([
             html.Div('when'),
             dcc.Input(id='when', value=0, type='number'),
@@ -47,7 +53,16 @@ simple_pitch = html.Div(children=[
             dcc.Input(id='volume', value=1, type='number', step=.1),
             ], className='two columns')
         ], className='row'),
-    html.Div(id='out-component', children='True')
+    html.Div([
+        html.Div(
+            children=json.dumps(dict(
+                path='https://surikov.github.io/webaudiofontdata/sound/0240_FluidR3_GM_sf2_file.js',
+                name='_tone_0240_FluidR3_GM_sf2_file')), 
+            id='change-input',
+            className='three columns')
+        ], className='row'),
+    html.Div(id='out-component', children='True'),
+    html.Div(id='out-component2', children='True'),
     ])
 
 
@@ -64,10 +79,7 @@ simple_pitch = html.Div(children=[
 
 
 app.clientside_callback(
-    ClientsideFunction(
-        namespace='dash_midi',
-        function_name='play'
-    ),
+    ClientsideFunction(namespace='dash_midi', function_name='play'),
     Output('out-component', 'children'),
     Input('preset', 'value'),
     Input('when', 'value'),
@@ -75,6 +87,12 @@ app.clientside_callback(
     Input('duration', 'value'),
     Input('volume', 'value'),
 )
+
+# app.clientside_callback(
+#     ClientsideFunction(namespace='dash_midi', function_name='changeInstrument'),
+#     Output('out-component2', 'children'),
+#     Input('change-input', 'children'),
+# )
 
 app.layout = html.Div([simple_pitch])
 
