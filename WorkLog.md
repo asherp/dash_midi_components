@@ -1,3 +1,6 @@
+
+# 2021-08-09 19:48:42.151054: clock-in
+
 # 2021-08-08 17:59:56.055759: clock-out
 
 * switchable instrument
