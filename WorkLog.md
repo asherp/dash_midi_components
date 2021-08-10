@@ -1,3 +1,4 @@
+* instruments will load on the fly
 
 # 2021-08-09 19:48:42.151054: clock-in
 

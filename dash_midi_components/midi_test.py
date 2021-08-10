@@ -1,6 +1,16 @@
+# -*- coding: utf-8 -*-
+# %load_ext autoreload
+# %autoreload 2
+
+from midi_loader import instruments
+
 from jupyter_dash import JupyterDash
 
 from dash import Dash
+
+# +
+# dcc.Dropdown?
+# -
 
 from dash.dependencies import Input, Output, ClientsideFunction
 
@@ -12,6 +22,8 @@ import json
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
+# preload one instrument from every category
+
 app = JupyterDash(__name__,
                   external_stylesheets=external_stylesheets,
                   external_scripts=['https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js',
@@ -19,47 +31,45 @@ app = JupyterDash(__name__,
                                     'https://surikov.github.io/webaudiofontdata/sound/0240_Chaos_sf2_file.js',])
 
 
-# changeInstrument('https://surikov.github.io/webaudiofontdata/sound/0290_Aspirin_sf2_file.js','_tone_0290_Aspirin_sf2_file');
+cat_0 = list(instruments.keys())[0]
+instr_type_0 = list(instruments[cat_0].keys())[0]
+instr_0 = instruments[cat_0][instr_type_0][0]
 
 simple_pitch = html.Div(children=[
     html.Div([
         html.Div([
-            html.Div('preset'),
+            dcc.Dropdown(
+                id='category',
+                options=[{'label': cat, 'value': cat} for cat in instruments.keys()],
+                value=cat_0,
+                clearable=False),
+            dcc.Dropdown(
+                id='instrument-type',
+                options=[{'label': instr, 'value': instr} for instr in instruments[cat_0]],
+                value=instr_type_0,
+                clearable=False),
             dcc.Dropdown(
                 id='preset',
-                options=[
-                    {'label': 'piano',
-                     'value': '0250_SoundBlasterOld_sf2'},
-                    {'label': 'guitar',
-                     'value': '0240_Chaos_sf2_file'},
-                ],
-                value='0250_SoundBlasterOld_sf2',
-                clearable=False,
-            )], className='three columns'),
+                options=[{'label': _, 'value': _} for _ in instruments[cat_0][instr_type_0]],
+                value=instr_0,
+                clearable=False),
+        ], className='three columns'),
         html.Div([
             html.Div('when'),
-            dcc.Input(id='when', value=0, type='number'),
+            dcc.Input(id='when', min=0, value=0, type='number'),
             ], className='two columns'),
         html.Div([
             html.Div('pitch'),
-            dcc.Input(id='pitch', value=42, type='number')
+            dcc.Input(id='pitch', min=0, value=42, type='number')
             ], className='two columns'),
         html.Div([
             html.Div('duration'),
-            dcc.Input(id='duration', value=2, type='number')
+            dcc.Input(id='duration', min=0, value=2, type='number')
             ], className='two columns'),
         html.Div([
             html.Div('volume'),
-            dcc.Input(id='volume', value=1, type='number', step=.1),
+            dcc.Input(id='volume', min=0, value=1, type='number', step=.1),
             ], className='two columns')
-        ], className='row'),
-    html.Div([
-        html.Div(
-            children=json.dumps(dict(
-                path='https://surikov.github.io/webaudiofontdata/sound/0240_FluidR3_GM_sf2_file.js',
-                name='_tone_0240_FluidR3_GM_sf2_file')), 
-            id='change-input',
-            className='three columns')
         ], className='row'),
     html.Div(id='out-component', children='True'),
     html.Div(id='out-component2', children='True'),
@@ -77,6 +87,22 @@ simple_pitch = html.Div(children=[
 
 # queueWaveTable(audioContext, target, preset, when, pitch, duration, volume, slides)
 
+@app.callback(
+    Output('instrument-type', 'options'),
+    Output('instrument-type', 'value'),
+    Input('category', 'value'))
+def fetch_instrument_types(cat):
+    instrument_types_ = list(instruments[cat].keys())
+    return [dict(label=_, value=_) for _ in instrument_types_], instrument_types_[0]
+
+@app.callback(
+    Output('preset', 'options'),
+    Output('preset', 'value'),
+    Input('category', 'value'),
+    Input('instrument-type', 'value'))
+def fetch_instruments(cat, instrument_type):
+    instruments_ = list(instruments[cat][instrument_type])
+    return [dict(label=_, value=_) for _ in instruments_], instruments_[0]
 
 app.clientside_callback(
     ClientsideFunction(namespace='dash_midi', function_name='play'),
@@ -88,11 +114,6 @@ app.clientside_callback(
     Input('volume', 'value'),
 )
 
-# app.clientside_callback(
-#     ClientsideFunction(namespace='dash_midi', function_name='changeInstrument'),
-#     Output('out-component2', 'children'),
-#     Input('change-input', 'children'),
-# )
 
 app.layout = html.Div([simple_pitch])
 
