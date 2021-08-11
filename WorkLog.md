@@ -1,3 +1,6 @@
+
+# 2021-08-10 21:44:19.252096: clock-in
+
 # 2021-08-09 22:42:36.605635: clock-out
 
 * instruments will load on the fly
