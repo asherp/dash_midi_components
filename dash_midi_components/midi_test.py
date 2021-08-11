@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# built on webaudiofont https://surikov.github.io/webaudiofont/
+
 # %load_ext autoreload
 # %autoreload 2
 
@@ -7,10 +9,6 @@ from midi_loader import instruments
 from jupyter_dash import JupyterDash
 
 from dash import Dash
-
-# +
-# dcc.Dropdown?
-# -
 
 from dash.dependencies import Input, Output, ClientsideFunction
 
@@ -22,7 +20,6 @@ import json
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-# preload one instrument from every category
 
 app = JupyterDash(__name__,
                   external_stylesheets=external_stylesheets,
@@ -30,6 +27,7 @@ app = JupyterDash(__name__,
                                     'https://surikov.github.io/webaudiofontdata/sound/0250_SoundBlasterOld_sf2.js',
                                     'https://surikov.github.io/webaudiofontdata/sound/0240_Chaos_sf2_file.js',])
 
+base = 'https://surikov.github.io/webaudiofontdata/sound/'
 
 cat_0 = list(instruments.keys())[0]
 instr_type_0 = list(instruments[cat_0].keys())[0]
@@ -50,9 +48,10 @@ simple_pitch = html.Div(children=[
                 clearable=False),
             dcc.Dropdown(
                 id='preset',
-                options=[{'label': _, 'value': _} for _ in instruments[cat_0][instr_type_0]],
-                value=instr_0,
+                options=[{'label': list(_.keys())[0], 'value': list(_.keys())[0]} for _ in instruments[cat_0][instr_type_0]],
+                value=list(instr_0.keys())[0],
                 clearable=False),
+            html.Div(id='path', children='hey'),
         ], className='three columns'),
         html.Div([
             html.Div('when'),
@@ -102,12 +101,25 @@ def fetch_instrument_types(cat):
     Input('instrument-type', 'value'))
 def fetch_instruments(cat, instrument_type):
     instruments_ = list(instruments[cat][instrument_type])
-    return [dict(label=_, value=_) for _ in instruments_], instruments_[0]
+    first_inst = list(instruments_[0].keys())[0]
+    return [dict(label=list(_.keys())[0],
+                 value=list(_.keys())[0]) for _ in instruments_], first_inst, first_inst
 
+@app.callback(
+    Output('path', 'children'),
+    Input('category', 'value'),
+    Input('instrument-type', 'value'),
+    Input('preset', 'value'))
+def fetch_instrument_path(cat, instrument_type, instrument_name):
+    print(instruments[cat][instrument_type])
+    print(cat, instrument_type, instrument_name)
+    return instruments[cat][instrument_type][instrument_name]
+    
 app.clientside_callback(
     ClientsideFunction(namespace='dash_midi', function_name='play'),
     Output('out-component', 'children'),
     Input('preset', 'value'),
+    Input('path', 'children'),
     Input('when', 'value'),
     Input('pitch', 'value'),
     Input('duration', 'value'),
@@ -118,6 +130,11 @@ app.clientside_callback(
 app.layout = html.Div([simple_pitch])
 
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port=8050, mode='external', debug=True)
+    app.run_server(host='0.0.0.0',
+                   port=8051,
+                   mode='external',
+                   debug=True)
 # -
+instr_0.keys()
+
 

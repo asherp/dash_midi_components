@@ -1,3 +1,4 @@
+// -*- coding: utf-8 -*-
 var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
 var audioContext = new AudioContextFunc();
 var player=new WebAudioFontPlayer();
@@ -24,39 +25,35 @@ var sound_library = {
 
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     dash_midi: {
+        play: function(preset, path, when, pitch, duration, volume) {
 
-        play: function(preset, when, pitch, duration, volume) {
-			instr_name = '_tone_' + preset
-
-        	if (typeof window[instr_name] !== 'undefined') {
-			    console.log('variable ' + instr_name + ' exists!')
-			    player.queueWaveTable(
-			    	audioContext,
-			    	audioContext.destination,
-			    	window['_tone_'+preset],
-			    	audioContext.currentTime + parseInt(when),
-			    	Math.max(parseInt(pitch), 0),
-			    	Math.max(duration, 0),
-			    	Math.max(volume, 0));
-			    return false;
-			} else {
-				console.log('loading ', instr_name);
-				path = base + preset + '.js';
-				player.loader.startLoad(audioContext, path, instr_name);
-				player.loader.waitLoad(function () {
-					instr=window[instr_name];
-			    player.queueWaveTable(
-			    	audioContext,
-			    	audioContext.destination,
-			    	window['_tone_'+preset],
-			    	audioContext.currentTime + parseInt(when),
-			    	Math.max(parseInt(pitch), 0),
-			    	Math.max(duration, 0),
-			    	Math.max(volume, 0));
-			    return false;
-
-				});
-			}
+            if (typeof window[preset] !== 'undefined') {
+                console.log('variable ' + preset + ' exists!')
+                player.queueWaveTable(
+                    audioContext,
+                    audioContext.destination,
+                    window[preset],
+                    audioContext.currentTime + parseInt(when),
+                    Math.max(parseInt(pitch), 0),
+                    Math.max(duration, 0),
+                    Math.max(volume, 0));
+                return false;
+            } else {
+                console.log('loading '+ preset + ' from ' + path);
+                player.loader.startLoad(audioContext, path, preset);
+                player.loader.waitLoad(function () {
+                    instr=window[preset];
+                player.queueWaveTable(
+                    audioContext,
+                    audioContext.destination,
+                    window[preset],
+                    audioContext.currentTime + parseInt(when),
+                    Math.max(parseInt(pitch), 0),
+                    Math.max(duration, 0),
+                    Math.max(volume, 0));
+                return false;
+                });
+            }
 
         },
     }
