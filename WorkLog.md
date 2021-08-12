@@ -1,3 +1,6 @@
+
+# 2021-08-11 19:27:43.031951: clock-in
+
 # 2021-08-10 23:51:08.472303: clock-out: T-30m 
 
 * refactoring instruments
