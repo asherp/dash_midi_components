@@ -4,7 +4,7 @@
 # %load_ext autoreload
 # %autoreload 2
 
-from midi_loader import instruments
+from midi_loader import instruments, instrument_paths
 
 from jupyter_dash import JupyterDash
 
@@ -48,8 +48,8 @@ simple_pitch = html.Div(children=[
                 clearable=False),
             dcc.Dropdown(
                 id='preset',
-                options=[{'label': list(_.keys())[0], 'value': list(_.keys())[0]} for _ in instruments[cat_0][instr_type_0]],
-                value=list(instr_0.keys())[0],
+                options=[dict(label=_, value=_) for _ in instruments[cat_0][instr_type_0]],
+                value=instr_0,
                 clearable=False),
             html.Div(id='path', children='hey'),
         ], className='three columns'),
@@ -101,19 +101,14 @@ def fetch_instrument_types(cat):
     Input('instrument-type', 'value'))
 def fetch_instruments(cat, instrument_type):
     instruments_ = list(instruments[cat][instrument_type])
-    first_inst = list(instruments_[0].keys())[0]
-    return [dict(label=list(_.keys())[0],
-                 value=list(_.keys())[0]) for _ in instruments_], first_inst, first_inst
+    first_inst = instruments_[0]
+    return [dict(label=_, value=_) for _ in instruments_], first_inst
 
 @app.callback(
     Output('path', 'children'),
-    Input('category', 'value'),
-    Input('instrument-type', 'value'),
     Input('preset', 'value'))
-def fetch_instrument_path(cat, instrument_type, instrument_name):
-    print(instruments[cat][instrument_type])
-    print(cat, instrument_type, instrument_name)
-    return instruments[cat][instrument_type][instrument_name]
+def fetch_instrument_path(instrument_name):
+    return instrument_paths[instrument_name]
     
 app.clientside_callback(
     ClientsideFunction(namespace='dash_midi', function_name='play'),
@@ -135,6 +130,4 @@ if __name__ == '__main__':
                    mode='external',
                    debug=True)
 # -
-instr_0.keys()
-
 
