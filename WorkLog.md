@@ -1,3 +1,5 @@
+# 2021-08-13 00:07:58.784821: clock-out
+
 * setup instructions
 * added intervals
 
