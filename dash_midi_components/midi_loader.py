@@ -64,15 +64,6 @@ class MidiDrumParser(HTMLParser):
 
 drums = MidiDrumParser('https://surikov.github.io/webaudiofontdata/sound/drums_6_SBLive_sf2Brush.html')
 
-# %%
-drums.paths
-
-# %%
-drums.pitches
-
-# %%
-drums.instruments
-
 
 # %%
 class MidiIndexParser(HTMLParser):
@@ -123,3 +114,4 @@ class MidiIndexParser(HTMLParser):
 midi_collection = MidiIndexParser()
 instruments = midi_collection.instruments
 instrument_paths = midi_collection.paths
+instrument_pitches = midi_collection.pitches

@@ -25,7 +25,7 @@ var sound_library = {
 
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     dash_midi: {
-        play: function(preset, path, when, pitch, duration, volume) {
+        play: function(preset, path, when, pitch, duration, volume, interval) {
 
             if (typeof window[preset] !== 'undefined') {
                 console.log('variable ' + preset + ' exists!')

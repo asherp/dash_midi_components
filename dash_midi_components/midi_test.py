@@ -4,13 +4,15 @@
 # %load_ext autoreload
 # %autoreload 2
 
-from midi_loader import instruments, instrument_paths
+from midi_loader import instruments, instrument_paths, instrument_pitches
 
 from jupyter_dash import JupyterDash
 
 from dash import Dash
 
 from dash.dependencies import Input, Output, ClientsideFunction
+
+from dash.exceptions import PreventUpdate
 
 # +
 from jupyter_dash import JupyterDash
@@ -34,6 +36,7 @@ instr_type_0 = list(instruments[cat_0].keys())[0]
 instr_0 = instruments[cat_0][instr_type_0][0]
 
 simple_pitch = html.Div(children=[
+    html.Div(html.A(href='https://surikov.github.io/webaudiofont/', children='webaudiofont')),
     html.Div([
         html.Div([
             dcc.Dropdown(
@@ -56,10 +59,11 @@ simple_pitch = html.Div(children=[
         html.Div([
             html.Div('when'),
             dcc.Input(id='when', min=0, value=0, type='number'),
+            dcc.Input(id='interval', min=.25, value=2, step=.25, type='number'),
             ], className='two columns'),
         html.Div([
             html.Div('pitch'),
-            dcc.Input(id='pitch', min=0, value=42, type='number')
+            dcc.Input(id='pitch', min=0, max=127, step=1, value=42, type='number')
             ], className='two columns'),
         html.Div([
             html.Div('duration'),
@@ -68,7 +72,8 @@ simple_pitch = html.Div(children=[
         html.Div([
             html.Div('volume'),
             dcc.Input(id='volume', min=0, value=1, type='number', step=.1),
-            ], className='two columns')
+            ], className='two columns'),
+        dcc.Interval(id='fire', interval=1000),
         ], className='row'),
     html.Div(id='out-component', children='True'),
     html.Div(id='out-component2', children='True'),
@@ -109,6 +114,25 @@ def fetch_instruments(cat, instrument_type):
     Input('preset', 'value'))
 def fetch_instrument_path(instrument_name):
     return instrument_paths[instrument_name]
+
+@app.callback(
+    Output('pitch', 'value'),
+    Input('preset', 'value'))
+def fetch_instrument_pitch(instrument_name):
+    pitch = instrument_pitches.get(instrument_name)
+    if pitch is not None:
+        return int(instrument_pitches[instrument_name])
+    raise PreventUpdate
+    
+    
+@app.callback(
+    Output('fire', 'interval'),
+    Input('interval', 'value'))
+def update_interval(interval):
+    if interval is not None:
+        return interval*1000
+    raise PreventUpdate
+
     
 app.clientside_callback(
     ClientsideFunction(namespace='dash_midi', function_name='play'),
@@ -119,7 +143,7 @@ app.clientside_callback(
     Input('pitch', 'value'),
     Input('duration', 'value'),
     Input('volume', 'value'),
-)
+    Input('fire', 'n_intervals'))
 
 
 app.layout = html.Div([simple_pitch])

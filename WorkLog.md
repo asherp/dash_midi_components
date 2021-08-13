@@ -1,3 +1,4 @@
+* added intervals
 
 # 2021-08-12 21:44:57.221008: clock-in
 
