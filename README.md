@@ -1,9 +1,10 @@
 
 # Dash Midi Components
 
+
 Generates client-side midi for plotly dash components, providing data-driven audio in the form of midi.
 
-`Dash Midi Componets` is built on [webaudiofont](https://surikov.github.io/webaudiofont/), a pure javascript midi library that includes a large collection of midi intrustruments. `Dash Midi Components` parses the html files from webaudiofont and makes it easy to use them through dash clientside callbacks. 
+
 
 ## Usage
 
@@ -14,6 +15,14 @@ cd dash_midi_components
 python midi_test.py
 ```
 
+## Requirements
+
+* dash `1.21.0` - use `pip install dash`
+* webaudiofont - no installation necessary!
+
+`Dash Midi Componets` is built on [webaudiofont](https://surikov.github.io/webaudiofont/), a pure javascript midi library that includes a large collection of midi intrustruments. `webaudiofont` libraries are served from github, so no installation is necessary provided you have an internet connection.
+
+`Dash Midi Components` simply parses the instrument catalogue from the `webaudiofont` github repo and makes them available them through dash clientside callbacks. A demo dashboard is included (see below).
 
 ## Notes
 
@@ -25,6 +34,10 @@ Custom samples may be defined by following this [tutorial](https://surikov.githu
 
 The webaudiofont library includes a total of 175 instruments with 5226 voicings, divided among the following categories shown below.
 
+<details>
+	<summary> click to expand catalogue </summary>
+
+```console
 Piano
  Acoustic Grand Piano (8)
  Bright Acoustic Piano (8)
@@ -217,3 +230,6 @@ Drums
  Open Cuica (47)
  Mute Triangle (47)
  Open Triangle (47)
+```
+
+</details>
